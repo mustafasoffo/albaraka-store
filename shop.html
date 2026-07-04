@@ -2,8 +2,9 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>مفروشات البركة</title>
+  <title>مفروشات البركة - المتجر</title>
 </head>
+
 <body style="font-family:Arial; background:#f5f5f5; margin:0;">
 
 <div style="background:#333; color:white; padding:20px;">
@@ -17,33 +18,35 @@
 <div style="background:white; padding:15px; margin:10px; border-radius:10px;">
   <h3>🪑 مرجوحة نارا</h3>
   <p>الكود: MR-001</p>
-  <button onclick="addToOrder('مرجوحة نارا - MR-001')">➕ أضف إلى الطلب</button>
+  <button onclick="addToCart('مرجوحة نارا - MR-001')">➕ أضف للسلة</button>
 </div>
 
 <div style="background:white; padding:15px; margin:10px; border-radius:10px;">
   <h3>🍽️ طاولة زان</h3>
   <p>الكود: TZ-002</p>
-  <button onclick="addToOrder('طاولة زان - TZ-002')">➕ أضف إلى الطلب</button>
+  <button onclick="addToCart('طاولة زان - TZ-002')">➕ أضف للسلة</button>
 </div>
 
 <hr>
 
-<h2>📋 الطلب الحالي</h2>
+<h2>🛒 السلة</h2>
 <ul id="cart"></ul>
 
-<button onclick="sendOrder()" style="padding:10px 20px;">📤 إرسال الطلب</button>
+<button onclick="sendOrder()" style="padding:10px 20px; font-size:16px;">
+📤 إرسال الطلب
+</button>
 
 </div>
 
 <script>
 let cart = [];
 
-function addToOrder(item) {
+function addToCart(item){
   cart.push(item);
   showCart();
 }
 
-function showCart() {
+function showCart(){
   let list = document.getElementById("cart");
   list.innerHTML = "";
 
@@ -54,19 +57,38 @@ function showCart() {
   });
 }
 
-function sendOrder() {
-  if(cart.length === 0) return alert("❌ السلة فارغة");
+async function sendOrder(){
 
-  let orders = JSON.parse(localStorage.getItem("orders")) || [];
+  if(cart.length === 0){
+    alert("❌ السلة فارغة");
+    return;
+  }
 
-  orders.push("طلب جديد: " + cart.join(" + "));
+  let name = prompt("اسم الزبون:");
+  let phone = prompt("رقم الهاتف:");
+  let city = prompt("المحافظة:");
 
-  localStorage.setItem("orders", JSON.stringify(orders));
+  let order = {
+    id: Date.now(),
+    customer: name,
+    phone: phone,
+    city: city,
+    items: cart,
+    status: "جديد"
+  };
+
+  await fetch("/api/orders", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(order)
+  });
 
   cart = [];
   showCart();
 
-  alert("✅ تم إرسال الطلب");
+  alert("✅ تم إرسال الطلب بنجاح");
 }
 </script>
 
