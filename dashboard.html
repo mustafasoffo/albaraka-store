@@ -2,91 +2,78 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>لوحة الإدارة</title>
+  <title>لوحة الطلبات</title>
 </head>
-<body style="font-family:Arial; text-align:center; margin-top:30px;">
 
-<h1>🧑‍💼 لوحة الإدارة</h1>
+<body style="font-family:Arial; background:#f5f5f5; margin:0;">
+
+<div style="background:#222; color:white; padding:15px;">
+  <h1>📊 لوحة الطلبات - مفروشات البركة</h1>
+</div>
+
+<div style="padding:20px;">
+
+<button onclick="loadOrders()" style="padding:10px 15px;">
+🔄 تحديث الطلبات
+</button>
+
+<button onclick="clearOrders()" style="padding:10px 15px; margin-left:10px;">
+🗑️ حذف كل الطلبات
+</button>
 
 <hr>
 
-<h2>📦 المنتجات (تجربة)</h2>
+<div id="orders"></div>
 
-<input type="text" id="name" placeholder="اسم المنتج"><br><br>
-<input type="text" id="code" placeholder="كود المنتج"><br><br>
-
-<button onclick="addProduct()">➕ إضافة منتج</button>
-
-<ul id="productsList" style="list-style:none;"></ul>
-
-<hr>
-
-<h2>📋 الطلبات</h2>
-
-<input type="text" id="orderText" placeholder="اكتب الطلب (مثال: مرجوحة نارا - MR-001)"><br><br>
-
-<button onclick="addOrder()">➕ إضافة طلب</button>
-
-<ul id="ordersList" style="list-style:none;"></ul>
+</div>
 
 <script>
-let products = JSON.parse(localStorage.getItem("products")) || [];
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
-// عرض المنتجات
-function showProducts() {
-  let list = document.getElementById("productsList");
-  list.innerHTML = "";
+async function loadOrders(){
 
-  products.forEach(p => {
-    let li = document.createElement("li");
-    li.innerHTML = "🪑 " + p.name + " - " + p.code;
-    list.appendChild(li);
+  let res = await fetch("/api/orders");
+  let data = await res.json();
+
+  let box = document.getElementById("orders");
+  box.innerHTML = "";
+
+  if(data.length === 0){
+    box.innerHTML = "<p>لا يوجد طلبات</p>";
+    return;
+  }
+
+  data.forEach((o, index) => {
+
+    let items = o.items ? o.items.join(" , ") : "";
+
+    box.innerHTML += `
+      <div style="background:white; padding:15px; margin:10px; border-radius:10px;">
+        <h3>📦 طلب رقم ${index + 1}</h3>
+        <p>👤 الاسم: ${o.customer || "-"}</p>
+        <p>📞 الهاتف: ${o.phone || "-"}</p>
+        <p>📍 المحافظة: ${o.city || "-"}</p>
+        <p>🛒 الطلبات: ${items}</p>
+        <p>📌 الحالة: ${o.status || "جديد"}</p>
+      </div>
+    `;
+
   });
+
 }
 
-// إضافة منتج
-function addProduct() {
-  let name = document.getElementById("name").value;
-  let code = document.getElementById("code").value;
+async function clearOrders(){
 
-  if(name === "" || code === "") return alert("❌ املأ البيانات");
+  if(!confirm("هل تريد حذف كل الطلبات؟")) return;
 
-  products.push({name, code});
-  localStorage.setItem("products", JSON.stringify(products));
-
-  showProducts();
-}
-
-// عرض الطلبات
-function showOrders() {
-  let list = document.getElementById("ordersList");
-  list.innerHTML = "";
-
-  orders.forEach(o => {
-    let li = document.createElement("li");
-    li.innerHTML = "📦 " + o;
-    list.appendChild(li);
+  await fetch("/api/orders", {
+    method: "DELETE"
   });
+
+  loadOrders();
 }
 
-// إضافة طلب
-function addOrder() {
-  let order = document.getElementById("orderText").value;
+loadOrders();
 
-  if(order === "") return alert("❌ اكتب الطلب");
-
-  orders.push(order);
-  localStorage.setItem("orders", JSON.stringify(orders));
-
-  showOrders();
-
-  document.getElementById("orderText").value = "";
-}
-
-// تشغيل أولي
-showProducts();
-showOrders();
 </script>
 
 </body>
