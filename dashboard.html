@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة الإدارة</title>
+</head>
+<body style="font-family:Arial; text-align:center; margin-top:30px;">
+
+<h1>🧑‍💼 لوحة الإدارة</h1>
+
+<hr>
+
+<h2>📦 المنتجات (تجربة)</h2>
+
+<input type="text" id="name" placeholder="اسم المنتج"><br><br>
+<input type="text" id="code" placeholder="كود المنتج"><br><br>
+
+<button onclick="addProduct()">➕ إضافة منتج</button>
+
+<ul id="productsList" style="list-style:none;"></ul>
+
+<hr>
+
+<h2>📋 الطلبات</h2>
+
+<input type="text" id="orderText" placeholder="اكتب الطلب (مثال: مرجوحة نارا - MR-001)"><br><br>
+
+<button onclick="addOrder()">➕ إضافة طلب</button>
+
+<ul id="ordersList" style="list-style:none;"></ul>
+
+<script>
+let products = JSON.parse(localStorage.getItem("products")) || [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+// عرض المنتجات
+function showProducts() {
+  let list = document.getElementById("productsList");
+  list.innerHTML = "";
+
+  products.forEach(p => {
+    let li = document.createElement("li");
+    li.innerHTML = "🪑 " + p.name + " - " + p.code;
+    list.appendChild(li);
+  });
+}
+
+// إضافة منتج
+function addProduct() {
+  let name = document.getElementById("name").value;
+  let code = document.getElementById("code").value;
+
+  if(name === "" || code === "") return alert("❌ املأ البيانات");
+
+  products.push({name, code});
+  localStorage.setItem("products", JSON.stringify(products));
+
+  showProducts();
+}
+
+// عرض الطلبات
+function showOrders() {
+  let list = document.getElementById("ordersList");
+  list.innerHTML = "";
+
+  orders.forEach(o => {
+    let li = document.createElement("li");
+    li.innerHTML = "📦 " + o;
+    list.appendChild(li);
+  });
+}
+
+// إضافة طلب
+function addOrder() {
+  let order = document.getElementById("orderText").value;
+
+  if(order === "") return alert("❌ اكتب الطلب");
+
+  orders.push(order);
+  localStorage.setItem("orders", JSON.stringify(orders));
+
+  showOrders();
+
+  document.getElementById("orderText").value = "";
+}
+
+// تشغيل أولي
+showProducts();
+showOrders();
+</script>
+
+</body>
+</html>

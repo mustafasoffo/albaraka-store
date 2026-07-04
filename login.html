@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تسجيل دخول الإدارة</title>
+</head>
+<body style="text-align:center; font-family:Arial; margin-top:100px;">
+
+<h2>🔐 لوحة الإدارة</h2>
+
+<input type="text" id="user" placeholder="اسم المستخدم"><br><br>
+<input type="password" id="pass" placeholder="كلمة المرور"><br><br>
+
+<button onclick="login()">تسجيل الدخول</button>
+
+<script>
+function login() {
+  var username = document.getElementById("user").value;
+  var password = document.getElementById("pass").value;
+
+  if(username === "admin" && password === "1234") {
+    window.location.href = "dashboard.html";
+  } else {
+    alert("❌ البيانات غير صحيحة");
+  }
+}
+</script>
+
+</body>
+</html>
